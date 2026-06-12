@@ -422,11 +422,20 @@ def render_header(records: list[ImageRecord]) -> None:
         count = summary.loc[summary["Kelas"] == class_name, "Jumlah Gambar"].sum()
         cols[index].metric(class_name.replace("_", " "), f"{int(count):,}")
 
+    if not records:
+        st.info(
+            "Dataset lokal tidak ditemukan. Ini aman untuk hosting prediksi: "
+            "upload gambar di tab Prediksi selama file model `.pth` tersedia di folder `models`."
+        )
+
 
 def render_dataset_tab(records: list[ImageRecord]) -> None:
     st.subheader("Dataset Lokal")
     if not records:
-        st.warning(f"Dataset tidak ditemukan di: {RAW_DATASET_DIR}")
+        st.warning(
+            f"Dataset tidak ditemukan di: {RAW_DATASET_DIR}. "
+            "Tab ini hanya diperlukan untuk eksplorasi data atau training ulang."
+        )
         return
 
     summary = summarize_records(records)
@@ -493,7 +502,10 @@ def render_prediction_tab() -> None:
 def render_training_tab(records: list[ImageRecord]) -> None:
     st.subheader("Training Model")
     if not records:
-        st.warning("Dataset belum tersedia, training belum bisa dijalankan.")
+        st.warning(
+            "Dataset belum tersedia, jadi training ulang tidak bisa dijalankan di sini. "
+            "Untuk hosting gratis, ini normal karena app sebaiknya hanya menjalankan prediksi."
+        )
         return
     if torch is None or timm is None:
         st.error(
